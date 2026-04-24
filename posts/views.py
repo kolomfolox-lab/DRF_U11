@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from .models import Post
 from .serializers import PostSerializer
+from .permissions import IsOwnerOrReadOnly
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
@@ -17,8 +18,11 @@ class PostViewSet(viewsets.ModelViewSet):
         if self.action in ['list', 'retrieve']:
             permission_classes = [permissions.AllowAny]
         else:
-            permission_classes = [permissions.IsAuthenticated]
+            permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
         return [permission() for permission in permission_classes]
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
 class RegisterView(APIView):
     permission_classes = [permissions.AllowAny]
