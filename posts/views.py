@@ -8,7 +8,7 @@ from .serializers import PostSerializer
 from .permissions import IsOwnerOrReadOnly
 
 class PostViewSet(viewsets.ModelViewSet):
-    queryset = Post.objects.all()
+    queryset = Post.objects.select_related('author').all()
     serializer_class = PostSerializer
     filterset_fields = ['created_at', 'title']
     search_fields = ['title', 'content']
